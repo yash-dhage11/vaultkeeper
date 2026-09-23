@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - VaultKeeper{% endblock %}
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3>Your Vault</h3>
+    <a href="{{ url_for('add_item') }}" class="btn btn-success">+ Add New</a>
+</div>
+
+{% if items|length == 0 %}
+    <div class="alert alert-secondary">
+        Your vault is empty. Click "Add New" to save your first password.
+    </div>
+{% else %}
+<div class="row g-3">
+    {% for item in items %}
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100 vault-card">
+            <div class="card-body">
+                <h5 class="card-title">{{ item.site_name }}</h5>
+                <p class="card-text mb-1"><strong>Username:</strong> {{ item.site_username }}</p>
+                <p class="card-text mb-1">
+                    <strong>Password:</strong>
+                    <span class="password-mask" id="pwd-{{ item.id }}" data-password="{{ item.password }}">••••••••</span>
+                    <button class="btn btn-sm btn-link p-0 ms-2" onclick="togglePassword('{{ item.id }}')">show</button>
+                </p>
+                {% if item.notes %}
+                <p class="card-text text-muted small">{{ item.notes }}</p>
+                {% endif %}
+            </div>
+            <div class="card-footer bg-transparent">
+                <a href="{{ url_for('delete_item', item_id=item.id) }}"
+                   class="btn btn-sm btn-outline-danger"
+                   onclick="return confirm('Delete this entry?')">Delete</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+{% endblock %}
