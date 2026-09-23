@@ -25,6 +25,7 @@ KEY_PATH = os.path.join(os.path.dirname(__file__), "instance", "secret.key")
 # ---------------------------------------------------------------------------
 def load_or_create_key():
     """Load the Fernet key from disk, or create one if it doesn't exist yet."""
+    os.makedirs(os.path.dirname(KEY_PATH), exist_ok=True)
     if os.path.exists(KEY_PATH):
         with open(KEY_PATH, "rb") as f:
             return f.read()
