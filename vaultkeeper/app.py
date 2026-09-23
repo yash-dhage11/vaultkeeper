@@ -14,8 +14,11 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from cryptography.fernet import Fernet
 
 app = Flask(__name__)
-app.secret_key = "change-this-secret-key-before-deploying"  # TODO: move to env variable
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", "change-this-secret-key-before-deploying")
 
+# On Render's free tier the filesystem resets on redeploy/restart, so vault
+# data won't persist forever across deploys unless you attach a paid disk.
+# For a class project this is fine — data survives while the app is running.
 DB_PATH = os.path.join(os.path.dirname(__file__), "instance", "vault.db")
 KEY_PATH = os.path.join(os.path.dirname(__file__), "instance", "secret.key")
 
@@ -236,8 +239,13 @@ def delete_item(item_id):
 
 
 # ---------------------------------------------------------------------------
-# Entry point
+# Make sure the database exists whether run via `python app.py`
+# (local dev) or via gunicorn (production/Render)
+# ---------------------------------------------------------------------------
+init_db()
+
+# ---------------------------------------------------------------------------
+# Entry point (local development only)
 # ---------------------------------------------------------------------------
 if __name__ == "__main__":
-    init_db()
     app.run(debug=True)
